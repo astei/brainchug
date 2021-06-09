@@ -14,6 +14,10 @@ public class LoopBrainfuckBlock implements BrainfuckBlock {
         this.blocks = List.copyOf(blocks);
     }
 
+    public List<BrainfuckBlock> getBlocks() {
+        return blocks;
+    }
+
     @Override
     public void emit(MethodVisitor visitor) {
         Label body = new Label();
@@ -37,5 +41,10 @@ public class LoopBrainfuckBlock implements BrainfuckBlock {
 
         visitor.visitJumpInsn(GOTO, body);
         visitor.visitLabel(tail);
+    }
+
+    @Override
+    public String toString() {
+        return "LOOP:" + this.blocks;
     }
 }

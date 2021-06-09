@@ -95,4 +95,9 @@ public class BasicBrainfuckBlock implements BrainfuckBlock {
             mv.visitInsn(CASTORE);
         }
     }
+
+    @Override
+    public String toString() {
+        return keyword.toString();
+    }
 }

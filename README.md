@@ -16,5 +16,5 @@ MIT license, see `LICENSE` for details.
 
 ## Current status
 
-Functionality-wise, it is a complete implementation of Brainfuck, but it is hilariously unoptimized (not even basic
-peephole optimizations have been applied).
+Functionality-wise, it is a complete implementation of Brainfuck, but it is hilariously unoptimized. Only the very basic
+of peephole optimizations has been applied.

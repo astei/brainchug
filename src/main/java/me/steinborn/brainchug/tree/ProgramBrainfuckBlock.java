@@ -11,10 +11,19 @@ public class ProgramBrainfuckBlock implements BrainfuckBlock {
         this.blocks = List.copyOf(blocks);
     }
 
+    public List<BrainfuckBlock> getBlocks() {
+        return blocks;
+    }
+
     @Override
     public void emit(MethodVisitor visitor) {
         for (BrainfuckBlock block : this.blocks) {
             block.emit(visitor);
         }
+    }
+
+    @Override
+    public String toString() {
+        return blocks.toString();
     }
 }

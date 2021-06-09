@@ -21,15 +21,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
         Target currentTarget = null;
         int currentAmount = 0;
         for (BrainfuckBlock block : blocks) {
-            if (block instanceof LoopBrainfuckBlock) {
-                if (currentTarget != null && currentAmount != 0) {
-                    optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER
-                            ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
-                    currentTarget = null;
-                    currentAmount = 0;
-                }
-                optimized.add(new LoopBrainfuckBlock(process(((LoopBrainfuckBlock) block).getBlocks())));
-            } else if (block instanceof SuperwordBrainfuckBlock) {
+            if (block instanceof SuperwordBrainfuckBlock) {
                 BrainfuckKeyword localKeyword = ((SuperwordBrainfuckBlock) block).getKeyword();
                 int localAmount = ((SuperwordBrainfuckBlock) block).getCount() * value(localKeyword);
 
@@ -60,7 +52,11 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                     currentTarget = null;
                 }
 
-                optimized.add(block);
+                if (block instanceof LoopBrainfuckBlock) {
+                    optimized.add(new LoopBrainfuckBlock(process(((LoopBrainfuckBlock) block).getBlocks())));
+                } else {
+                    optimized.add(block);
+                }
             }
         }
         // still have the target?

@@ -1,8 +1,10 @@
-package me.steinborn.brainchug.tree;
+package me.steinborn.brainchug.compiler.tree;
 
 import me.steinborn.brainchug.BrainfuckKeyword;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Set;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -10,15 +12,35 @@ import static org.objectweb.asm.Opcodes.CASTORE;
 
 public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
+    private static final Map<BrainfuckKeyword, SuperwordBrainfuckBlock> FOR_ONES = new EnumMap<>(BrainfuckKeyword.class);
+
     public static final Set<BrainfuckKeyword> RELEVANT = Set.of(BrainfuckKeyword.INCREMENT_PTR,
             BrainfuckKeyword.INCREMENT_VAL, BrainfuckKeyword.DECREMENT_PTR, BrainfuckKeyword.DECREMENT_VAL);
+
+    static {
+        for (BrainfuckKeyword keyword : RELEVANT) {
+            FOR_ONES.put(keyword, new SuperwordBrainfuckBlock(keyword, 1));
+        }
+    }
 
     private final BrainfuckKeyword keyword;
     private final int count;
 
-    public SuperwordBrainfuckBlock(BrainfuckKeyword keyword, int count) {
+    private SuperwordBrainfuckBlock(BrainfuckKeyword keyword, int count) {
         this.keyword = keyword;
         this.count = count;
+    }
+
+    public static SuperwordBrainfuckBlock valueOf(BrainfuckKeyword keyword, int count) {
+        if (!RELEVANT.contains(keyword)) {
+            throw new IllegalArgumentException(keyword + " isn't superword-capable");
+        }
+
+        if (count == 1) {
+            return FOR_ONES.get(keyword);
+        } else {
+            return new SuperwordBrainfuckBlock(keyword, count);
+        }
     }
 
     public BrainfuckKeyword getKeyword() {

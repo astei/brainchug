@@ -1,9 +1,10 @@
 import me.steinborn.brainchug.BrainfuckKeyword;
 import me.steinborn.brainchug.compiler.BrainfuckClassCompiler;
+import me.steinborn.brainchug.compiler.tree.optimizer.IdiomOptimizer;
 import me.steinborn.brainchug.reader.BrainfuckLexer;
-import me.steinborn.brainchug.tree.BrainfuckTreeProducer;
-import me.steinborn.brainchug.tree.ProgramBrainfuckBlock;
-import me.steinborn.brainchug.tree.optimizer.GreedyPeepholeOptimizer;
+import me.steinborn.brainchug.compiler.tree.BrainfuckTreeProducer;
+import me.steinborn.brainchug.compiler.tree.ProgramBrainfuckBlock;
+import me.steinborn.brainchug.compiler.tree.optimizer.GreedyPeepholeOptimizer;
 
 import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
@@ -19,11 +20,13 @@ public class Test {
 
         ProgramBrainfuckBlock tree = BrainfuckTreeProducer.treeify(lexed);
         ProgramBrainfuckBlock opt = new GreedyPeepholeOptimizer().optimize(tree);
+        ProgramBrainfuckBlock opt2 = new IdiomOptimizer().optimize(opt);
 
         System.out.println("ORIG: " + tree);
         System.out.println("OPT1: " + opt);
+        System.out.println("OPT2: " + opt2);
 
-        byte[] klazz = BrainfuckClassCompiler.compile(opt);
+        byte[] klazz = BrainfuckClassCompiler.compile(opt2);
 //        CheckClassAdapter.verify(new ClassReader(klazz), true, new PrintWriter(System.err));
 
         try (OutputStream s = Files.newOutputStream(Paths.get("Produced.class"), StandardOpenOption.CREATE)) {

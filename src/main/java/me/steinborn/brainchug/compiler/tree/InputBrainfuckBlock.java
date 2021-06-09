@@ -1,7 +1,6 @@
-package me.steinborn.brainchug.tree;
+package me.steinborn.brainchug.compiler.tree;
 
 import me.steinborn.brainchug.BrainfuckKeyword;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 

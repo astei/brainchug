@@ -1,13 +1,14 @@
-package me.steinborn.brainchug.tree.optimizer;
+package me.steinborn.brainchug.compiler.tree.optimizer;
 
 import me.steinborn.brainchug.BrainfuckKeyword;
-import me.steinborn.brainchug.tree.*;
+import me.steinborn.brainchug.compiler.tree.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A greedy peephole optimizer.
+ * A greedy peephole optimizer. This optimize finds "runs" of nearby increment/decrement operations and combines them.
+ * This is the classical Brainfuck optimization.
  */
 public class GreedyPeepholeOptimizer implements Optimizer {
     @Override
@@ -34,7 +35,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                     } else {
                         // we must stop emitting here
                         if (currentAmount != 0) {
-                            optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER
+                            optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
                                     ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
                         }
 
@@ -46,7 +47,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
             } else {
                 // we must stop emitting here
                 if (currentTarget != null && currentAmount != 0) {
-                    optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER
+                    optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
                             ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
                     currentAmount = 0;
                     currentTarget = null;
@@ -61,7 +62,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
         }
         // still have the target?
         if (currentTarget != null && currentAmount != 0) {
-            optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER
+            optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
                     ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
         }
         return optimized;

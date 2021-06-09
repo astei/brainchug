@@ -1,6 +1,6 @@
 package me.steinborn.brainchug.compiler;
 
-import me.steinborn.brainchug.tree.ProgramBrainfuckBlock;
+import me.steinborn.brainchug.compiler.tree.ProgramBrainfuckBlock;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;

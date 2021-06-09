@@ -1,4 +1,4 @@
-package me.steinborn.brainchug.tree;
+package me.steinborn.brainchug.compiler.tree;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

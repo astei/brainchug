@@ -3,10 +3,16 @@ package me.steinborn.brainchug.tree;
 import me.steinborn.brainchug.BrainfuckKeyword;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Set;
+
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.CASTORE;
 
 public class SuperwordBrainfuckBlock implements BrainfuckBlock {
+
+    public static final Set<BrainfuckKeyword> RELEVANT = Set.of(BrainfuckKeyword.INCREMENT_PTR,
+            BrainfuckKeyword.INCREMENT_VAL, BrainfuckKeyword.DECREMENT_PTR, BrainfuckKeyword.DECREMENT_VAL);
+
     private final BrainfuckKeyword keyword;
     private final int count;
 

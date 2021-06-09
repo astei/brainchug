@@ -5,15 +5,11 @@ import me.steinborn.brainchug.tree.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A greedy peephole optimizer.
  */
 public class GreedyPeepholeOptimizer implements Optimizer {
-    private static final Set<BrainfuckKeyword> RELEVANT = Set.of(BrainfuckKeyword.INCREMENT_PTR,
-            BrainfuckKeyword.INCREMENT_VAL, BrainfuckKeyword.DECREMENT_PTR, BrainfuckKeyword.DECREMENT_VAL);
-
     @Override
     public ProgramBrainfuckBlock optimize(ProgramBrainfuckBlock in) {
         return new ProgramBrainfuckBlock(process(in.getBlocks()));
@@ -25,29 +21,10 @@ public class GreedyPeepholeOptimizer implements Optimizer {
         Target currentTarget = null;
         int currentAmount = 0;
         for (BrainfuckBlock block : blocks) {
-            BrainfuckKeyword localKeyword;
-            int localAmount;
+            if (block instanceof SuperwordBrainfuckBlock) {
+                BrainfuckKeyword localKeyword = ((SuperwordBrainfuckBlock) block).getKeyword();
+                int localAmount = ((SuperwordBrainfuckBlock) block).getCount() * value(localKeyword);
 
-            if (block instanceof BasicBrainfuckBlock) {
-                localKeyword = ((BasicBrainfuckBlock) block).getKeyword();
-                localAmount = value(localKeyword);
-            } else if (block instanceof SuperwordBrainfuckBlock) {
-                localKeyword = ((SuperwordBrainfuckBlock) block).getKeyword();
-                localAmount = ((SuperwordBrainfuckBlock) block).getCount() * value(localKeyword);
-            } else if (block instanceof LoopBrainfuckBlock) {
-                if (currentTarget != null && currentAmount != 0) {
-                    optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER
-                            ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
-                    currentTarget = null;
-                    currentAmount = 0;
-                }
-                optimized.add(new LoopBrainfuckBlock(process(((LoopBrainfuckBlock) block).getBlocks())));
-                continue;
-            } else {
-                continue;
-            }
-
-            if (RELEVANT.contains(localKeyword)) {
                 if (currentTarget == null) {
                     currentTarget = target(localKeyword);
                     currentAmount = localAmount;
@@ -78,7 +55,6 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                 optimized.add(block);
             }
         }
-
         // still have the target?
         if (currentTarget != null && currentAmount != 0) {
             optimized.add(new SuperwordBrainfuckBlock(currentTarget == Target.POINTER

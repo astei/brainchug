@@ -22,7 +22,11 @@ public class BrainfuckTreeProducer {
                 List<BrainfuckBlock> gathered = blocks.removeLast();
                 blocks.peekLast().add(new LoopBrainfuckBlock(gathered));
             } else {
-                blocks.peekLast().add(new BasicBrainfuckBlock(keyword));
+                if (SuperwordBrainfuckBlock.RELEVANT.contains(keyword)) {
+                    blocks.peekLast().add(new SuperwordBrainfuckBlock(keyword, 1));
+                } else {
+                    blocks.peekLast().add(new InputBrainfuckBlock(keyword));
+                }
             }
         }
 

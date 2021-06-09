@@ -7,10 +7,10 @@ import org.objectweb.asm.Type;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class BasicBrainfuckBlock implements BrainfuckBlock {
+public class InputBrainfuckBlock implements BrainfuckBlock {
     private final BrainfuckKeyword keyword;
 
-    public BasicBrainfuckBlock(BrainfuckKeyword keyword) {
+    public InputBrainfuckBlock(BrainfuckKeyword keyword) {
         this.keyword = keyword;
     }
 
@@ -20,43 +20,7 @@ public class BasicBrainfuckBlock implements BrainfuckBlock {
 
     @Override
     public void emit(MethodVisitor mv) {
-        if (keyword == BrainfuckKeyword.INCREMENT_PTR) {
-            // Load 1 to the top of the stack and add it to index.
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IADD);
-        } else if (keyword == BrainfuckKeyword.DECREMENT_PTR) {
-            // Load 1 to the top of the stack and subtract it from index.
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(ISUB);
-        } else if (keyword == BrainfuckKeyword.INCREMENT_VAL) {
-            // Emit DUP2 twice to prepare the stack
-            mv.visitInsn(DUP2);
-            mv.visitInsn(DUP2);
-
-            // CALOAD undoes the second DUP2 and loads just the value.
-            mv.visitInsn(CALOAD);
-
-            // Load 1 to the top of the stack and add it to value.
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IADD);
-
-            // Now use CASTORE to store the value back into the stack.
-            mv.visitInsn(CASTORE);
-        } else if (keyword == BrainfuckKeyword.DECREMENT_VAL) {
-            // Emit DUP2 twice to prepare the stack
-            mv.visitInsn(DUP2);
-            mv.visitInsn(DUP2);
-
-            // CALOAD undoes the second DUP2 and loads just the value.
-            mv.visitInsn(CALOAD);
-
-            // Load 1 to the top of the stack and subtract it from the value.
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(ISUB);
-
-            // Now use CASTORE to store the value back into the stack.
-            mv.visitInsn(CASTORE);
-        } else if (keyword == BrainfuckKeyword.PRINT_VAL) {
+        if (keyword == BrainfuckKeyword.PRINT_VAL) {
             // Duplicate the top entries of the stack.
             mv.visitInsn(DUP2);
 

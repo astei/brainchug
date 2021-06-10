@@ -5,7 +5,7 @@ import me.steinborn.brainchug.compiler.tree.BrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.LoopBrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.ProgramBrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.SuperwordBrainfuckBlock;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ZeroIdiomOptimizer implements Optimizer {
         }
 
         @Override
-        public void emit(MethodVisitor mv) {
+        public void emit(GeneratorAdapter mv, int ptrVar) {
             mv.visitInsn(DUP2);
             if (this.offset != 0) {
                 mv.visitLdcInsn(this.offset);

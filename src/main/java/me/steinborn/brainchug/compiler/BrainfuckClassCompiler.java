@@ -4,6 +4,8 @@ import me.steinborn.brainchug.compiler.tree.ProgramBrainfuckBlock;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.Method;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -16,7 +18,7 @@ public class BrainfuckClassCompiler {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 
         // Emit a public Java 8 class extending Object and implementing the Runnable interface
-        writer.visit(V1_8, ACC_PUBLIC | ACC_FINAL, "Produced", null, SUPER_NAME, IMPLEMENTED);
+        writer.visit(V1_8, ACC_PUBLIC | ACC_FINAL, "Produced", null, SUPER_NAME, asMain ? new String[0] : IMPLEMENTED);
 
         // Create the constructor. In our case, we only want to invoke the super constructor.
         {
@@ -31,20 +33,16 @@ public class BrainfuckClassCompiler {
 
         // Implement the run()V method (or main(). This is the "meat and potatoes" of the whole venture.
         {
-            MethodVisitor mv;
+            GeneratorAdapter mv;
             if (asMain) {
-                mv = writer.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+                mv = new GeneratorAdapter(ACC_PUBLIC | ACC_STATIC, Method.getMethod("void main (String[])"), null, null, writer);
             } else {
-                mv = writer.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+                mv = new GeneratorAdapter(ACC_PUBLIC, Method.getMethod("void run ()"), null, null, writer);
             }
-            mv.visitCode();
 
-            // Create the cell array
-            mv.visitLdcInsn(16384);
+            mv.push(16384);
             mv.visitIntInsn(NEWARRAY, T_CHAR);
-
-            // Store the pointer here.
-            mv.visitInsn(ICONST_0);
+            mv.push(0);
 
             // At this point, we now have the following stack layout:
             // - cells
@@ -53,7 +51,7 @@ public class BrainfuckClassCompiler {
             // operands.
 
             // With our array created, we can now execute program logic.
-            block.emit(mv);
+            block.emit(mv, 0);
 
             // Flush all output if we haven't done so already.
             mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out",
@@ -63,10 +61,10 @@ public class BrainfuckClassCompiler {
                     "()V", false);
 
             mv.visitInsn(RETURN);
-            mv.visitMaxs(0, 0);
-            mv.visitEnd();
+            mv.endMethod();
         }
 
+        writer.visitEnd();
         return writer.toByteArray();
     }
 }

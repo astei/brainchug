@@ -5,7 +5,7 @@ import me.steinborn.brainchug.compiler.tree.BrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.LoopBrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.ProgramBrainfuckBlock;
 import me.steinborn.brainchug.compiler.tree.SuperwordBrainfuckBlock;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +115,7 @@ public class MultiplicationIdiomOptimizer implements Optimizer {
         }
 
         @Override
-        public void emit(MethodVisitor mv) {
+        public void emit(GeneratorAdapter mv, int ptrVar) {
             // load the current value at this pointer
             mv.visitInsn(DUP2);
             mv.visitInsn(CALOAD);

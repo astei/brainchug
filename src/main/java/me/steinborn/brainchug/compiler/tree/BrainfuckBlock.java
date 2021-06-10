@@ -1,7 +1,7 @@
 package me.steinborn.brainchug.compiler.tree;
 
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 public interface BrainfuckBlock {
-    void emit(MethodVisitor visitor);
+    void emit(GeneratorAdapter visitor, int ptrVar);
 }

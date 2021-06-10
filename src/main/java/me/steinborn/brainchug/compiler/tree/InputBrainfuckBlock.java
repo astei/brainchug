@@ -1,8 +1,8 @@
 package me.steinborn.brainchug.compiler.tree;
 
 import me.steinborn.brainchug.BrainfuckKeyword;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -18,7 +18,7 @@ public class InputBrainfuckBlock implements BrainfuckBlock {
     }
 
     @Override
-    public void emit(MethodVisitor mv) {
+    public void emit(GeneratorAdapter mv, int ptrVar) {
         if (keyword == BrainfuckKeyword.PRINT_VAL) {
             // Duplicate the top entries of the stack.
             mv.visitInsn(DUP2);

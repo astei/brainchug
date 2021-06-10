@@ -1,7 +1,7 @@
 package me.steinborn.brainchug.compiler.tree;
 
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class LoopBrainfuckBlock implements BrainfuckBlock {
     }
 
     @Override
-    public void emit(MethodVisitor visitor) {
+    public void emit(GeneratorAdapter visitor, int ptrVar) {
         Label body = new Label();
         Label tail = new Label();
 
@@ -36,7 +36,7 @@ public class LoopBrainfuckBlock implements BrainfuckBlock {
 
         // Emit code in the blocks
         for (BrainfuckBlock block : blocks) {
-            block.emit(visitor);
+            block.emit(visitor, ptrVar);
         }
 
         visitor.visitJumpInsn(GOTO, body);

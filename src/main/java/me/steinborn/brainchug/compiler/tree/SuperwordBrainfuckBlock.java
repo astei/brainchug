@@ -1,7 +1,7 @@
 package me.steinborn.brainchug.compiler.tree;
 
 import me.steinborn.brainchug.BrainfuckKeyword;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -58,20 +58,20 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
     }
 
     @Override
-    public void emit(MethodVisitor mv) {
+    public void emit(GeneratorAdapter mv, int ptrVar) {
         if (keyword == BrainfuckKeyword.INCREMENT_PTR) {
             // Load count to the top of the stack and add it to index.
-            mv.visitLdcInsn(this.count);
+            mv.push(this.count);
             mv.visitInsn(IADD);
         } else if (keyword == BrainfuckKeyword.DECREMENT_PTR) {
             // Load count to the top of the stack and subtract it from index.
-            mv.visitLdcInsn(this.count);
+            mv.push(this.count);
             mv.visitInsn(ISUB);
         } else if (keyword == BrainfuckKeyword.INCREMENT_VAL) {
             // Emit DUP2 twice to prepare the stack
             mv.visitInsn(DUP2);
             if (this.offset != 0) {
-                mv.visitLdcInsn(this.offset);
+                mv.push(this.offset);
                 mv.visitInsn(IADD);
             }
             mv.visitInsn(DUP2);
@@ -80,7 +80,7 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
             mv.visitInsn(CALOAD);
 
             // Load the count to the top of the stack and add it to value.
-            mv.visitLdcInsn(this.count);
+            mv.push(this.count);
             mv.visitInsn(IADD);
 
             // Now use CASTORE to store the value back into the stack.
@@ -89,7 +89,7 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
             // Emit DUP2 twice to prepare the stack
             mv.visitInsn(DUP2);
             if (this.offset != 0) {
-                mv.visitLdcInsn(this.offset);
+                mv.push(this.offset);
                 mv.visitInsn(IADD);
             }
             mv.visitInsn(DUP2);
@@ -98,7 +98,7 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
             mv.visitInsn(CALOAD);
 
             // Load count to the top of the stack and subtract it from the value.
-            mv.visitLdcInsn(this.count);
+            mv.push(this.count);
             mv.visitInsn(ISUB);
 
             // Now use CASTORE to store the value back into the stack.

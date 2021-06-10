@@ -1,6 +1,6 @@
 package me.steinborn.brainchug.compiler.tree;
 
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public class ProgramBrainfuckBlock implements BrainfuckBlock {
     }
 
     @Override
-    public void emit(MethodVisitor visitor) {
+    public void emit(GeneratorAdapter visitor, int ptrVar) {
         for (BrainfuckBlock block : this.blocks) {
-            block.emit(visitor);
+            block.emit(visitor, ptrVar);
         }
     }
 

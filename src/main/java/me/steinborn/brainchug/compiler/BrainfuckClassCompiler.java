@@ -12,7 +12,7 @@ public class BrainfuckClassCompiler {
     private static final String SUPER_NAME = "java/lang/Object";
     private static final String[] IMPLEMENTED = new String[]{Type.getInternalName(Runnable.class)};
 
-    public static byte[] compile(ProgramBrainfuckBlock block) {
+    public static byte[] compile(ProgramBrainfuckBlock block, boolean asMain) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 
         // Emit a public Java 8 class extending Object and implementing the Runnable interface
@@ -29,9 +29,14 @@ public class BrainfuckClassCompiler {
             mv.visitEnd();
         }
 
-        // Implement the run()V method. This is the "meat and potatoes" of the whole venture.
+        // Implement the run()V method (or main(). This is the "meat and potatoes" of the whole venture.
         {
-            MethodVisitor mv = writer.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+            MethodVisitor mv;
+            if (asMain) {
+                mv = writer.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+            } else {
+                mv = writer.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+            }
             mv.visitCode();
 
             // Create the cell array
@@ -49,6 +54,13 @@ public class BrainfuckClassCompiler {
 
             // With our array created, we can now execute program logic.
             block.emit(mv);
+
+            // Flush all output if we haven't done so already.
+            mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out",
+                    Type.getObjectType("java/io/PrintStream").getDescriptor());
+
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "flush",
+                    "()V", false);
 
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);

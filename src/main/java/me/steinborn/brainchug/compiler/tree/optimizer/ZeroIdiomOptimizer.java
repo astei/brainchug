@@ -11,12 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
-import static org.objectweb.asm.Opcodes.CASTORE;
 
 /**
- * Tries to optimize some common idioms in Brainfuck.
+ * Optimizes the zero-cell idiom ([-]).
  */
-public class IdiomOptimizer implements Optimizer {
+public class ZeroIdiomOptimizer implements Optimizer {
     @Override
     public ProgramBrainfuckBlock optimize(ProgramBrainfuckBlock in) {
         return new ProgramBrainfuckBlock(process(in.getBlocks()));
@@ -31,7 +30,7 @@ public class IdiomOptimizer implements Optimizer {
                 if (loopBlocks.size() == 1 && loopBlocks.get(0) instanceof SuperwordBrainfuckBlock &&
                         mightDecrement((SuperwordBrainfuckBlock) loopBlocks.get(0))) {
                     // Common idiom: [-] will set the value in the given cell at the position to 0.
-                    optimized.add(new ZeroIdiomInstruction());
+                    optimized.add(new ZeroIdiomInstruction(0));
                 } else {
                     optimized.add(new LoopBrainfuckBlock(process(((LoopBrainfuckBlock) block).getBlocks())));
                 }
@@ -48,18 +47,32 @@ public class IdiomOptimizer implements Optimizer {
                 || (block.getKeyword() == BrainfuckKeyword.INCREMENT_VAL && Math.signum(block.getCount()) == -1);
     }
 
-    private static class ZeroIdiomInstruction implements BrainfuckBlock {
+    public static class ZeroIdiomInstruction implements BrainfuckBlock {
+
+        private final int offset;
+
+        public ZeroIdiomInstruction(int offset) {
+            this.offset = offset;
+        }
 
         @Override
         public void emit(MethodVisitor mv) {
             mv.visitInsn(DUP2);
+            if (this.offset != 0) {
+                mv.visitLdcInsn(this.offset);
+                mv.visitInsn(IADD);
+            }
             mv.visitInsn(ICONST_0);
             mv.visitInsn(CASTORE);
         }
 
         @Override
         public String toString() {
-            return "ZERO";
+            if (this.offset != 0) {
+                return "ZERO => " + this.offset;
+            } else {
+                return "ZERO";
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ public class BrainfuckTreeProducer {
                 blocks.peekLast().add(new LoopBrainfuckBlock(gathered));
             } else {
                 if (SuperwordBrainfuckBlock.RELEVANT.contains(keyword)) {
-                    blocks.peekLast().add(SuperwordBrainfuckBlock.valueOf(keyword, 1));
+                    blocks.peekLast().add(SuperwordBrainfuckBlock.valueOf(keyword, 0, 1));
                 } else {
                     blocks.peekLast().add(new InputBrainfuckBlock(keyword));
                 }

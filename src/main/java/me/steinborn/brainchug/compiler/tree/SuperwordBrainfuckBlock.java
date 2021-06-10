@@ -19,32 +19,38 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
     static {
         for (BrainfuckKeyword keyword : RELEVANT) {
-            FOR_ONES.put(keyword, new SuperwordBrainfuckBlock(keyword, 1));
+            FOR_ONES.put(keyword, new SuperwordBrainfuckBlock(keyword, 0, 1));
         }
     }
 
     private final BrainfuckKeyword keyword;
+    private final int offset;
     private final int count;
 
-    private SuperwordBrainfuckBlock(BrainfuckKeyword keyword, int count) {
+    private SuperwordBrainfuckBlock(BrainfuckKeyword keyword, int offset, int count) {
         this.keyword = keyword;
+        this.offset = offset;
         this.count = count;
     }
 
-    public static SuperwordBrainfuckBlock valueOf(BrainfuckKeyword keyword, int count) {
+    public static SuperwordBrainfuckBlock valueOf(BrainfuckKeyword keyword, int offset, int count) {
         if (!RELEVANT.contains(keyword)) {
             throw new IllegalArgumentException(keyword + " isn't superword-capable");
         }
 
-        if (count == 1) {
+        if (count == 1 && offset == 0) {
             return FOR_ONES.get(keyword);
         } else {
-            return new SuperwordBrainfuckBlock(keyword, count);
+            return new SuperwordBrainfuckBlock(keyword, offset, count);
         }
     }
 
     public BrainfuckKeyword getKeyword() {
         return keyword;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 
     public int getCount() {
@@ -64,6 +70,10 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
         } else if (keyword == BrainfuckKeyword.INCREMENT_VAL) {
             // Emit DUP2 twice to prepare the stack
             mv.visitInsn(DUP2);
+            if (this.offset != 0) {
+                mv.visitLdcInsn(this.offset);
+                mv.visitInsn(IADD);
+            }
             mv.visitInsn(DUP2);
 
             // CALOAD undoes the second DUP2 and loads just the value.
@@ -78,6 +88,10 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
         } else if (keyword == BrainfuckKeyword.DECREMENT_VAL) {
             // Emit DUP2 twice to prepare the stack
             mv.visitInsn(DUP2);
+            if (this.offset != 0) {
+                mv.visitLdcInsn(this.offset);
+                mv.visitInsn(IADD);
+            }
             mv.visitInsn(DUP2);
 
             // CALOAD undoes the second DUP2 and loads just the value.
@@ -94,6 +108,10 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
     @Override
     public String toString() {
-        return keyword + " x " + count;
+        if (offset == 0) {
+            return keyword + " x " + count;
+        } else {
+            return keyword + " => " + offset + " x " + count;
+        }
     }
 }

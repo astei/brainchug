@@ -36,7 +36,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                         // we must stop emitting here
                         if (currentAmount != 0) {
                             optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
-                                    ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
+                                    ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, 0, currentAmount));
                         }
 
                         // this is the new target now
@@ -48,7 +48,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                 // we must stop emitting here
                 if (currentTarget != null && currentAmount != 0) {
                     optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
-                            ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
+                            ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, 0, currentAmount));
                     currentAmount = 0;
                     currentTarget = null;
                 }
@@ -63,7 +63,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
         // still have the target?
         if (currentTarget != null && currentAmount != 0) {
             optimized.add(SuperwordBrainfuckBlock.valueOf(currentTarget == Target.POINTER
-                    ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, currentAmount));
+                    ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, 0, currentAmount));
         }
         return optimized;
     }

@@ -36,13 +36,6 @@ public class InputBrainfuckBlock implements BrainfuckBlock {
             // Call the function.
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print",
                     "(C)V", false);
-
-            // Fetch it again since it was popped off the stack again. We need to flush.
-            mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out",
-                    Type.getObjectType("java/io/PrintStream").getDescriptor());
-
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "flush",
-                    "()V", false);
         } else if (keyword == BrainfuckKeyword.INPUT_VAL) {
             // Clone the pointers...
             mv.visitInsn(DUP2);
@@ -56,6 +49,23 @@ public class InputBrainfuckBlock implements BrainfuckBlock {
 
             // Our implementation will store -1, just like Java
             mv.visitInsn(CASTORE);
+        } else if (keyword == BrainfuckKeyword.DEBUG) {
+            // Duplicate the top entries of the stack.
+            mv.visitInsn(DUP2);
+
+            // CALOAD undoes the DUP2 and loads the value from the array we need.
+            mv.visitInsn(CALOAD);
+
+            // We now need to call System.out.print(C)V. First, fetch System.out...
+            mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out",
+                    Type.getObjectType("java/io/PrintStream").getDescriptor());
+
+            // Swap the top two items of the stack since they're in the wrong order.
+            mv.visitInsn(SWAP);
+
+            // Call the function.
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print",
+                    "(I)V", false);
         }
     }
 

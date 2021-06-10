@@ -5,6 +5,13 @@ It compiles the Brainfuck source code to JVM bytecode, generating classes which 
 
 This is some work I'm planning to write up on my blog.
 
+## Environment
+
+Brainchug presents to the executed Brainfuck program an execution environment that has:
+
+* 16,384 signed 16-bit cells that do not wrap
+* EOF is -1
+
 ## Should I use this?
 
 Only if you like incomplete software, esolangs running on platforms that don't usually get esoteric languages

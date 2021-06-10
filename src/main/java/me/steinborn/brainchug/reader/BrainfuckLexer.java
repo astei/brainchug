@@ -42,6 +42,8 @@ public class BrainfuckLexer {
                 keywords.add(BrainfuckKeyword.LOOP_BEGIN);
             } else if (in == ']') {
                 keywords.add(BrainfuckKeyword.LOOP_END);
+            } else if (in == '#') {
+                keywords.add(BrainfuckKeyword.DEBUG);
             }
         }
         return keywords;

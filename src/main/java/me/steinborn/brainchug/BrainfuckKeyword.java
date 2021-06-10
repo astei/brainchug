@@ -35,5 +35,9 @@ public enum BrainfuckKeyword {
     /**
      * Ends a loop. If the value pointed to by the pointer is non-zero, skip back to the beginning of the loop.
      */
-    LOOP_END
+    LOOP_END,
+    /**
+     * Debug keyword. Prints the value in the current cell to the console.
+     */
+    DEBUG
 }

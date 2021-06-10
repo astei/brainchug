@@ -128,12 +128,12 @@ public class MultiplicationIdiomOptimizer implements Optimizer {
 
             // put ptr on top, shift by the number of cells and their direction, swap again for multtiplication/CASTORE
             mv.visitInsn(SWAP);
-            mv.visitLdcInsn(cellsAndDirection);
+            mv.push(cellsAndDirection);
             mv.visitInsn(IADD);
             mv.visitInsn(SWAP);
 
             if (this.by != 1) {
-                mv.visitLdcInsn(by);
+                mv.push(by);
                 mv.visitInsn(IMUL);
             }
 
@@ -147,7 +147,7 @@ public class MultiplicationIdiomOptimizer implements Optimizer {
             mv.visitInsn(CASTORE);
 
             mv.visitInsn(DUP2);
-            mv.visitLdcInsn(0);
+            mv.push(0);
             mv.visitInsn(CASTORE);
         }
 

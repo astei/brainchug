@@ -59,7 +59,7 @@ public class ZeroIdiomOptimizer implements Optimizer {
         public void emit(GeneratorAdapter mv, int ptrVar) {
             mv.visitInsn(DUP2);
             if (this.offset != 0) {
-                mv.visitLdcInsn(this.offset);
+                mv.push(this.offset);
                 mv.visitInsn(IADD);
             }
             mv.visitInsn(ICONST_0);

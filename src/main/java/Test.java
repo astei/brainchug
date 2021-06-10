@@ -29,7 +29,7 @@ public class Test {
         for (Optimizer optimizer : optimizers) {
             tree = optimizer.optimize(tree);
         }
-//        dump(tree.getBlocks(), 0);
+        dump(tree.getBlocks(), 0);
 
         byte[] klazz = BrainfuckClassCompiler.compile(tree, true);
         // CheckClassAdapter.verify(new ClassReader(klazz), true, new PrintWriter(System.err));

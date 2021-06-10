@@ -43,8 +43,7 @@ public class ZeroIdiomOptimizer implements Optimizer {
     }
 
     private static boolean mightDecrement(SuperwordBrainfuckBlock block) {
-        return block.getKeyword() == BrainfuckKeyword.DECREMENT_VAL
-                || (block.getKeyword() == BrainfuckKeyword.INCREMENT_VAL && Math.signum(block.getCount()) == -1);
+        return !block.isPtr() & Math.signum(block.getCount()) == -1;
     }
 
     public static class ZeroIdiomInstruction implements BrainfuckBlock {

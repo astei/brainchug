@@ -73,14 +73,14 @@ public class MultiplicationIdiomOptimizer implements Optimizer {
             }
 
             SuperwordBrainfuckBlock word = (SuperwordBrainfuckBlock) loopBlock;
-            if (word.getKeyword() == BrainfuckKeyword.INCREMENT_VAL) {
+            if (!word.isPtr()) {
                 if (!haveAddition) {
                     additions = word.getCount();
                     haveAddition = true;
                 } else {
                     return null;
                 }
-            } else if (word.getKeyword() == BrainfuckKeyword.INCREMENT_PTR) {
+            } else {
                 if (word.getCount() < 0) {
                     if (!leftFirst && ptrLefts == 0 && ptrRights == 0) {
                         leftFirst = true;
@@ -100,8 +100,7 @@ public class MultiplicationIdiomOptimizer implements Optimizer {
     }
 
     private static boolean mightDecrement(SuperwordBrainfuckBlock block) {
-        return block.getKeyword() == BrainfuckKeyword.DECREMENT_VAL
-                || (block.getKeyword() == BrainfuckKeyword.INCREMENT_VAL && Math.signum(block.getCount()) == -1);
+        return !block.isPtr() & Math.signum(block.getCount()) == -1;
     }
 
     private static class MultiplicationIdiomBlock implements BrainfuckBlock {

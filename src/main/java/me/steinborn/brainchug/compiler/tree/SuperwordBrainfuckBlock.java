@@ -12,23 +12,20 @@ import static org.objectweb.asm.Opcodes.CASTORE;
 
 public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
-    private static final Map<BrainfuckKeyword, SuperwordBrainfuckBlock> FOR_ONES = new EnumMap<>(BrainfuckKeyword.class);
+    private static final SuperwordBrainfuckBlock PTR_DEC = new SuperwordBrainfuckBlock(true, 0, -1);
+    private static final SuperwordBrainfuckBlock PTR_INC = new SuperwordBrainfuckBlock(true, 0, 1);
+    private static final SuperwordBrainfuckBlock VAL_DEC = new SuperwordBrainfuckBlock(false, 0, -1);
+    private static final SuperwordBrainfuckBlock VAL_INC = new SuperwordBrainfuckBlock(false, 0, 1);
 
     public static final Set<BrainfuckKeyword> RELEVANT = Set.of(BrainfuckKeyword.INCREMENT_PTR,
             BrainfuckKeyword.INCREMENT_VAL, BrainfuckKeyword.DECREMENT_PTR, BrainfuckKeyword.DECREMENT_VAL);
 
-    static {
-        for (BrainfuckKeyword keyword : RELEVANT) {
-            FOR_ONES.put(keyword, new SuperwordBrainfuckBlock(keyword, 0, 1));
-        }
-    }
-
-    private final BrainfuckKeyword keyword;
+    private final boolean isPtr;
     private final int offset;
     private final int count;
 
-    private SuperwordBrainfuckBlock(BrainfuckKeyword keyword, int offset, int count) {
-        this.keyword = keyword;
+    private SuperwordBrainfuckBlock(boolean isPtr, int offset, int count) {
+        this.isPtr = isPtr;
         this.offset = offset;
         this.count = count;
     }
@@ -38,15 +35,34 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
             throw new IllegalArgumentException(keyword + " isn't superword-capable");
         }
 
-        if (count == 1 && offset == 0) {
-            return FOR_ONES.get(keyword);
-        } else {
-            return new SuperwordBrainfuckBlock(keyword, offset, count);
+        switch (keyword) {
+            case INCREMENT_PTR:
+                if (count == 1 && offset == 0) {
+                    return PTR_INC;
+                }
+                return new SuperwordBrainfuckBlock(true, offset, count);
+            case DECREMENT_PTR:
+                if (count == 1 && offset == 0) {
+                    return PTR_DEC;
+                }
+                return new SuperwordBrainfuckBlock(true, offset, -count);
+            case INCREMENT_VAL:
+                if (count == 1 && offset == 0) {
+                    return VAL_INC;
+                }
+                return new SuperwordBrainfuckBlock(false, offset, count);
+            case DECREMENT_VAL:
+                if (count == 1 && offset == 0) {
+                    return VAL_DEC;
+                }
+                return new SuperwordBrainfuckBlock(false, offset, -count);
+            default:
+                throw new IllegalStateException(keyword + " isn't a superword");
         }
     }
 
-    public BrainfuckKeyword getKeyword() {
-        return keyword;
+    public boolean isPtr() {
+        return isPtr;
     }
 
     public int getOffset() {
@@ -59,15 +75,11 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
     @Override
     public void emit(GeneratorAdapter mv, int ptrVar) {
-        if (keyword == BrainfuckKeyword.INCREMENT_PTR) {
+        if (isPtr) {
             // Load count to the top of the stack and add it to index.
             mv.push(this.count);
             mv.visitInsn(IADD);
-        } else if (keyword == BrainfuckKeyword.DECREMENT_PTR) {
-            // Load count to the top of the stack and subtract it from index.
-            mv.push(this.count);
-            mv.visitInsn(ISUB);
-        } else if (keyword == BrainfuckKeyword.INCREMENT_VAL) {
+        } else {
             // Emit DUP2 twice to prepare the stack
             mv.visitInsn(DUP2);
             if (this.offset != 0) {
@@ -85,29 +97,12 @@ public class SuperwordBrainfuckBlock implements BrainfuckBlock {
 
             // Now use CASTORE to store the value back into the stack.
             mv.visitInsn(CASTORE);
-        } else if (keyword == BrainfuckKeyword.DECREMENT_VAL) {
-            // Emit DUP2 twice to prepare the stack
-            mv.visitInsn(DUP2);
-            if (this.offset != 0) {
-                mv.push(this.offset);
-                mv.visitInsn(IADD);
-            }
-            mv.visitInsn(DUP2);
-
-            // CALOAD undoes the second DUP2 and loads just the value.
-            mv.visitInsn(CALOAD);
-
-            // Load count to the top of the stack and subtract it from the value.
-            mv.push(this.count);
-            mv.visitInsn(ISUB);
-
-            // Now use CASTORE to store the value back into the stack.
-            mv.visitInsn(CASTORE);
         }
     }
 
     @Override
     public String toString() {
+        String keyword = isPtr ? "PTR" : "VAL";
         if (offset == 0) {
             return keyword + " x " + count;
         } else {

@@ -20,18 +20,11 @@ public class OffsetBakeOptimizer implements Optimizer {
         int offsetFromCurrentPointer = 0;
         for (BrainfuckBlock block : blockList) {
             if (block instanceof SuperwordBrainfuckBlock) {
-                if (((SuperwordBrainfuckBlock) block).getKeyword() == BrainfuckKeyword.INCREMENT_PTR) {
+                if (((SuperwordBrainfuckBlock) block).isPtr()) {
                     offsetFromCurrentPointer += ((SuperwordBrainfuckBlock) block).getCount();
-                } else if (((SuperwordBrainfuckBlock) block).getKeyword() == BrainfuckKeyword.INCREMENT_VAL) {
+                } else {
                     optimized.add(SuperwordBrainfuckBlock.valueOf(BrainfuckKeyword.INCREMENT_VAL,
                             offsetFromCurrentPointer, ((SuperwordBrainfuckBlock) block).getCount()));
-                } else {
-                    // Flush out the current pointer write
-                    if (offsetFromCurrentPointer != 0) {
-                        optimized.add(SuperwordBrainfuckBlock.valueOf(BrainfuckKeyword.INCREMENT_PTR, 0, offsetFromCurrentPointer));
-                        offsetFromCurrentPointer = 0;
-                    }
-                    optimized.add(block);
                 }
             } else if (block instanceof ZeroIdiomOptimizer.ZeroIdiomInstruction) {
                 optimized.add(new ZeroIdiomOptimizer.ZeroIdiomInstruction(offsetFromCurrentPointer));

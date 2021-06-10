@@ -23,14 +23,14 @@ public class GreedyPeepholeOptimizer implements Optimizer {
         int currentAmount = 0;
         for (BrainfuckBlock block : blocks) {
             if (block instanceof SuperwordBrainfuckBlock) {
-                BrainfuckKeyword localKeyword = ((SuperwordBrainfuckBlock) block).getKeyword();
-                int localAmount = ((SuperwordBrainfuckBlock) block).getCount() * value(localKeyword);
+                Target localTarget = ((SuperwordBrainfuckBlock) block).isPtr() ? Target.POINTER : Target.VALUE;
+                int localAmount = ((SuperwordBrainfuckBlock) block).getCount();
 
                 if (currentTarget == null) {
-                    currentTarget = target(localKeyword);
+                    currentTarget = localTarget;
                     currentAmount = localAmount;
                 } else {
-                    if (target(localKeyword) == currentTarget) {
+                    if (localTarget == currentTarget) {
                         currentAmount += localAmount;
                     } else {
                         // we must stop emitting here
@@ -40,7 +40,7 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                         }
 
                         // this is the new target now
-                        currentTarget = target(localKeyword);
+                        currentTarget = localTarget;
                         currentAmount = localAmount;
                     }
                 }
@@ -66,32 +66,6 @@ public class GreedyPeepholeOptimizer implements Optimizer {
                     ? BrainfuckKeyword.INCREMENT_PTR : BrainfuckKeyword.INCREMENT_VAL, 0, currentAmount));
         }
         return optimized;
-    }
-
-    private static int value(BrainfuckKeyword keyword) {
-        switch (keyword) {
-            case INCREMENT_PTR:
-            case INCREMENT_VAL:
-                return 1;
-            case DECREMENT_PTR:
-            case DECREMENT_VAL:
-                return -1;
-            default:
-                return 0;
-        }
-    }
-
-    private static Target target(BrainfuckKeyword keyword) {
-        switch (keyword) {
-            case INCREMENT_PTR:
-            case DECREMENT_PTR:
-                return Target.POINTER;
-            case INCREMENT_VAL:
-            case DECREMENT_VAL:
-                return Target.VALUE;
-            default:
-                return null;
-        }
     }
 
     private enum Target {
